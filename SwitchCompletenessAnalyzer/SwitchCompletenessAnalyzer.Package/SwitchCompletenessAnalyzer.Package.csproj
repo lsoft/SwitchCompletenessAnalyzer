@@ -11,14 +11,12 @@
     <PackageId>SwitchCompletenessAnalyzer</PackageId>
     <PackageVersion>1.0.0.0</PackageVersion>
     <Authors>ls</Authors>
-    <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
-    <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
-    <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
-    <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/lsoft/SwitchCompletenessAnalyzer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lsoft/SwitchCompletenessAnalyzer</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>SwitchCompletenessAnalyzer</Description>
-    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
-    <Copyright>Copyright</Copyright>
+    <Description>SwitchCompletenessAnalyzer contains an analyzer against 'switch statement over enum' completeness regardless of the existense of default branch.</Description>
+    <Copyright>(c) lsoft 2022</Copyright>
     <PackageTags>SwitchCompletenessAnalyzer, analyzers</PackageTags>
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
