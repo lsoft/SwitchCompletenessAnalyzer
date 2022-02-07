@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SwitchCompletenessAnalyzer.Vsix": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\projects\\github\\SwitchCompletenessAnalyzer\\SwitchCompletenessAnalyzer\\SwitchCompletenessAnalyzer.Console\\SwitchCompletenessAnalyzer.Console.sln"
+    }
+  }
+}

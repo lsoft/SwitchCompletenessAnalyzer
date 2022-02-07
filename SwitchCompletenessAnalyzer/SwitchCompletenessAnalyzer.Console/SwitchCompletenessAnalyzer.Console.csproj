@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SwitchCompletenessMuteEnums>global::SwitchCompletenessAnalyzer.Console.Silent1Enum|global::SwitchCompletenessAnalyzer.Console.Silent2Enum|</SwitchCompletenessMuteEnums>
+  </PropertyGroup>
+
+  <!-- explicitly allow the analyzer to access that variable -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="SwitchCompletenessMuteEnums" />
+  </ItemGroup>
+
+
+</Project>

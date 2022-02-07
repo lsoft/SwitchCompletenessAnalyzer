@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32106.194
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32127.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitchCompletenessAnalyzer", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.csproj", "{DDD31BD1-4D2C-47C6-B770-A8D63EBBFDAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitchCompletenessAnalyzer", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.csproj", "{DDD31BD1-4D2C-47C6-B770-A8D63EBBFDAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitchCompletenessAnalyzer.Package", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.Package\SwitchCompletenessAnalyzer.Package.csproj", "{641C7E9B-1F84-471A-83A4-5072495EF2C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitchCompletenessAnalyzer.Package", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.Package\SwitchCompletenessAnalyzer.Package.csproj", "{641C7E9B-1F84-471A-83A4-5072495EF2C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitchCompletenessAnalyzer.Test", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.Test\SwitchCompletenessAnalyzer.Test.csproj", "{1203B2E9-381D-4EBB-A474-6A328CF996DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitchCompletenessAnalyzer.Test", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.Test\SwitchCompletenessAnalyzer.Test.csproj", "{1203B2E9-381D-4EBB-A474-6A328CF996DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitchCompletenessAnalyzer.Vsix", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.Vsix\SwitchCompletenessAnalyzer.Vsix.csproj", "{CE264935-5A2C-4781-A676-975E7FDE3B6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitchCompletenessAnalyzer.Vsix", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.Vsix\SwitchCompletenessAnalyzer.Vsix.csproj", "{CE264935-5A2C-4781-A676-975E7FDE3B6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitchCompletenessAnalyzer.Console", "SwitchCompletenessAnalyzer\SwitchCompletenessAnalyzer.Console\SwitchCompletenessAnalyzer.Console.csproj", "{5F9FB128-0768-4B25-BB7B-D96348CB9E3F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{CE264935-5A2C-4781-A676-975E7FDE3B6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE264935-5A2C-4781-A676-975E7FDE3B6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE264935-5A2C-4781-A676-975E7FDE3B6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F9FB128-0768-4B25-BB7B-D96348CB9E3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F9FB128-0768-4B25-BB7B-D96348CB9E3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F9FB128-0768-4B25-BB7B-D96348CB9E3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F9FB128-0768-4B25-BB7B-D96348CB9E3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
