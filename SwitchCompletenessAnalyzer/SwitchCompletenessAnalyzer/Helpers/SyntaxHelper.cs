@@ -9,6 +9,81 @@ namespace SwitchCompletenessAnalyzer.Helpers
 {
     internal static class SyntaxHelper
     {
+        private static readonly Dictionary<long, ISymbol> _emptyDictionary = new Dictionary<long, ISymbol>();
+
+        public static IReadOnlyDictionary<long, ISymbol> GetLabelSymbols(
+            this SwitchExpressionSyntax switchExpression,
+            SemanticModel model,
+            CancellationToken cancellationToken)
+        {
+            if (switchExpression is null)
+            {
+                throw new ArgumentNullException(nameof(switchExpression));
+            }
+
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var caseLabels = switchExpression.GetCaseSwitchLabels();
+            if (caseLabels == null)
+            {
+                return _emptyDictionary;
+            }
+
+            var labelSymbols = new Dictionary<long, ISymbol>();
+
+            foreach (var label in caseLabels)
+            {
+                if (!(model.GetSymbolInfo(label, cancellationToken).Symbol is IFieldSymbol fieldSymbol))
+                {
+                    // something is wrong with the label and the SemanticModel was unable to determine its symbol
+                    // or the symbol is not a field symbol which should be for case labels of switchs on enum types
+                    // abort analyzer
+                    return _emptyDictionary;
+                }
+                if (fieldSymbol.ConstantValue == null)
+                {
+                    //something wrong with access to value of the enum
+                    return _emptyDictionary;
+                }
+
+                var enumValue = fieldSymbol.ConstantValue.ToInt64();
+                labelSymbols.Add(enumValue, fieldSymbol);
+            }
+
+            return labelSymbols;
+        }
+
+        public static List<ExpressionSyntax>? GetCaseSwitchLabels(
+            this SwitchExpressionSyntax switchExpression
+            )
+        {
+            if (switchExpression is null)
+            {
+                throw new ArgumentNullException(nameof(switchExpression));
+            }
+
+            List<ExpressionSyntax>? caseLabels = null;
+
+            foreach (SwitchExpressionArmSyntax arm in switchExpression.Arms)
+            {
+                if (arm.Pattern is ConstantPatternSyntax cps)
+                {
+                    if (caseLabels == null)
+                    {
+                        caseLabels = new List<ExpressionSyntax>();
+                    }
+
+                    caseLabels.Add(cps.Expression);
+                }
+            }
+
+            return caseLabels;
+        }
+
+
         public static IReadOnlyDictionary<long, ISymbol> GetLabelSymbols(
             this SwitchStatementSyntax switchStatement,
             SemanticModel model,
@@ -24,9 +99,14 @@ namespace SwitchCompletenessAnalyzer.Helpers
                 throw new ArgumentNullException(nameof(model));
             }
 
+            var caseLabels = switchStatement.GetCaseSwitchLabels();
+            if (caseLabels == null)
+            {
+                return _emptyDictionary;
+            }
+
             var labelSymbols = new Dictionary<long, ISymbol>();
 
-            var caseLabels = switchStatement.GetCaseSwitchLabels();
             foreach (var label in caseLabels)
             {
                 if (!(model.GetSymbolInfo(label, cancellationToken).Symbol is IFieldSymbol fieldSymbol))
@@ -34,7 +114,12 @@ namespace SwitchCompletenessAnalyzer.Helpers
                     // something is wrong with the label and the SemanticModel was unable to determine its symbol
                     // or the symbol is not a field symbol which should be for case labels of switchs on enum types
                     // abort analyzer
-                    return new Dictionary<long, ISymbol>();
+                    return _emptyDictionary;
+                }
+                if (fieldSymbol.ConstantValue == null)
+                {
+                    //something wrong with access to value of the enum
+                    return _emptyDictionary;
                 }
 
                 var enumValue = fieldSymbol.ConstantValue.ToInt64();
@@ -44,7 +129,7 @@ namespace SwitchCompletenessAnalyzer.Helpers
             return labelSymbols;
         }
 
-        public static List<ExpressionSyntax> GetCaseSwitchLabels(
+        public static IReadOnlyList<ExpressionSyntax>? GetCaseSwitchLabels(
             this SwitchStatementSyntax switchStatement
             )
         {
@@ -53,15 +138,24 @@ namespace SwitchCompletenessAnalyzer.Helpers
                 throw new ArgumentNullException(nameof(switchStatement));
             }
 
-            var caseLabels = new List<ExpressionSyntax>();
+            List<ExpressionSyntax>? caseLabels = null;
 
             foreach (var section in switchStatement.Sections)
             {
-                foreach (var label in section.Labels)
+                var labels = section.Labels;
+                if (labels != null)
                 {
-                    if (label is CaseSwitchLabelSyntax caseLabel)
+                    foreach (var label in labels)
                     {
-                        caseLabels.Add(caseLabel.Value);
+                        if (label is CaseSwitchLabelSyntax caseLabel)
+                        {
+                            if (caseLabels == null)
+                            {
+                                caseLabels = new List<ExpressionSyntax>();
+                            }
+
+                            caseLabels.Add(caseLabel.Value);
+                        }
                     }
                 }
             }

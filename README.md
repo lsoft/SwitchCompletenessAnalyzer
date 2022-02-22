@@ -17,6 +17,19 @@ switch (subject) //no S1 case
 }
 ```
 
+or
+
+```C#
+public enum SubjectEnum { S0, S1, S2 };
+
+var subject = SubjectEnum.S0;
+var a = subject switch  //no S1 case
+{
+    SubjectEnum.S0 => 0,
+    SubjectEnum.S2 => 2
+};
+```
+
 You can convert the warning to the error via `<WarningsAsErrors>SWITCHCOMPLETENESS001</WarningsAsErrors>`, or suppress it:
 
 1. At project level add `<NoWarn>SWITCHCOMPLETENESS001</NoWarn>` to your `csproj` or `props` files.

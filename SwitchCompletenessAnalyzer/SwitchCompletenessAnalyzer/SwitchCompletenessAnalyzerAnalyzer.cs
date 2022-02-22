@@ -41,84 +41,103 @@ namespace SwitchCompletenessAnalyzer
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
             
-            context.RegisterSyntaxNodeAction(AnalyzeSwitchStatement, SyntaxKind.SwitchStatement);
+            context.RegisterSyntaxNodeAction(CheckSwithStatement, SyntaxKind.SwitchStatement);
+            context.RegisterSyntaxNodeAction(CheckSwithExpression, SyntaxKind.SwitchExpression);
         }
 
-        private void AnalyzeSwitchStatement(SyntaxNodeAnalysisContext context)
+        private void CheckSwithExpression(SyntaxNodeAnalysisContext context)
         {
-            //try
-            //{
+            var switchExpression = context.TryGetSyntaxNode<SwitchExpressionSyntax>();
+            if (switchExpression == null)
+            {
+                return;
+            }
 
-                var switchStatement = context.TryGetSyntaxNode<SwitchStatementSyntax>();
-                if (switchStatement == null)
-                {
-                    return;
-                }
+            var semanticModel = context.SemanticModel;
+            var enumType = semanticModel.GetTypeInfo(switchExpression.GoverningExpression, context.CancellationToken).Type as INamedTypeSymbol;
+            if (enumType == null)
+            {
+                return;
+            }
 
-                var globalOptions = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
+            var silentEnumList = ParseSilentEnum(context);
 
-                //File.AppendAllText(@"c:\temp\_a.txt", (globalOptions == null ? "<globalOptions NULL>" : "<globalOptions NOT NULL>") + Environment.NewLine);
+            if (!IsValidSwitch(enumType, ref silentEnumList))
+            {
+                return;
+            }
 
-                string silentEnumList = null;
-                globalOptions?.TryGetValue("build_property.SwitchCompletenessMuteEnums", out silentEnumList);
-                if (string.IsNullOrWhiteSpace(silentEnumList))
-                {
-                    silentEnumList = Delimiter;
-                }
-                else if (!silentEnumList.EndsWith(Delimiter))
-                {
-                    silentEnumList += Delimiter;
-                }
-                //File.AppendAllText(@"c:\temp\_a.txt", (silentEnumList == "" ? "<EMPTY>" : silentEnumList) + Environment.NewLine);
+            var labelSymbols = switchExpression.GetLabelSymbols(semanticModel, context.CancellationToken);
+            var possibleEnumSymbols = enumType.GetAllPossibleEnumSymbols();
 
-                var semanticModel = context.SemanticModel;
-                var enumType = semanticModel.GetTypeInfo(switchStatement.Expression, context.CancellationToken).Type as INamedTypeSymbol;
+            var fail = CheckForFail(labelSymbols, possibleEnumSymbols);
+            if (fail)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(_rule, switchExpression.SwitchKeyword.GetLocation()));
+            }
+        }
 
-                if (!IsValidSwitch(enumType, ref silentEnumList))
-                {
-                    return;
-                }
+        private void CheckSwithStatement(SyntaxNodeAnalysisContext context)
+        {
+            var switchStatement = context.TryGetSyntaxNode<SwitchStatementSyntax>();
+            if (switchStatement == null)
+            {
+                return;
+            }
 
-                //if (!switchStatement.HasDefaultSwitchStatement())
-                //{
-                //    context.ReportDiagnostic(Diagnostic.Create(_rule, switchStatement.SwitchKeyword.GetLocation()));
-                //    return;
-                //}
+            var semanticModel = context.SemanticModel;
+            var enumType = semanticModel.GetTypeInfo(switchStatement.Expression, context.CancellationToken).Type as INamedTypeSymbol;
+            if (enumType == null)
+            {
+                return;
+            }
 
-                var labelSymbols = switchStatement.GetLabelSymbols(semanticModel, context.CancellationToken);
-                if (!labelSymbols.Any())
-                {
-                    return;
-                }
+            var silentEnumList = ParseSilentEnum(context);
 
-                var possibleEnumSymbols = enumType.GetAllPossibleEnumSymbols();
-                if (!possibleEnumSymbols.Any())
-                {
-                    return;
-                }
+            if (!IsValidSwitch(enumType, ref silentEnumList))
+            {
+                return;
+            }
 
-                // possibleEnumSymbols and labelSymbols has a dictionary with the enum value and its corresponding symbols
-                // I'm not using the symbols but I could compare a one symbol to another
-                // right now I'm comparing only the enum values
-                var possibleEnumValues = possibleEnumSymbols.Keys
-                    .OrderBy(x => x)
-                    .ToList();
-                var declaredEnumValues = labelSymbols.Keys
-                    .OrderBy(x => x)
-                    .ToList();
+            var labelSymbols = switchStatement.GetLabelSymbols(semanticModel, context.CancellationToken);
+            var possibleEnumSymbols = enumType.GetAllPossibleEnumSymbols();
 
-                if (declaredEnumValues.SequenceEqual(possibleEnumValues))
-                {
-                    return;
-                }
-
+            var fail = CheckForFail(labelSymbols, possibleEnumSymbols);
+            if (fail)
+            {
                 context.ReportDiagnostic(Diagnostic.Create(_rule, switchStatement.SwitchKeyword.GetLocation()));
-            //}
-            //catch (Exception excp)
-            //{
-            //    File.AppendAllText(@"c:\temp\_a.txt", ("exception: " + excp.Message) + Environment.NewLine);
-            //    File.AppendAllText(@"c:\temp\_a.txt", ("exception: " + excp.StackTrace) + Environment.NewLine);
-            //}
+            }
+        }
+
+        private bool CheckForFail(
+            IReadOnlyDictionary<long, ISymbol> labelSymbols,
+            IReadOnlyDictionary<long, List<ISymbol>> possibleEnumSymbols
+            )
+        {
+            if (labelSymbols.Count != possibleEnumSymbols.Count)
+            {
+                return true;
+            }
+
+            foreach (var dev in labelSymbols.Keys)
+            {
+                foreach (var pev in possibleEnumSymbols.Keys)
+                {
+                    if (dev == pev)
+                    {
+                        goto ok;
+                    }
+                }
+
+                //appropriate value does not found
+                return true;
+
+            ok:
+                //next iteration
+                ;
+            }
+
+            return false;
         }
 
         private bool IsValidSwitch(
@@ -132,11 +151,9 @@ namespace SwitchCompletenessAnalyzer
                 return false;
             }
 
-            //File.AppendAllText(@"c:\temp\_a.txt", (silentEnumList == "" ? "<silentEnumList EMPTY>" : "silentEnumList " + silentEnumList) + Environment.NewLine);
             if (!string.IsNullOrEmpty(silentEnumList))
             {
                 var fullName = enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                //File.AppendAllText(@"c:\temp\_a.txt", (fullName == "" ? "<fullName EMPTY>" : "fullName " + fullName) + Environment.NewLine);
 
                 var fullName2 = fullName + Delimiter;
                 if (silentEnumList.Contains(fullName2))
@@ -148,14 +165,38 @@ namespace SwitchCompletenessAnalyzer
             // ignore enums marked with Flags
             foreach (var attribute in enumType.GetAttributes())
             {
-                var containingClass = attribute.AttributeClass.ToDisplayString();
-                if (containingClass == _flagAttributeFullName)
+                if (attribute.AttributeClass != null)
                 {
-                    return false;
+                    var containingClass = attribute.AttributeClass.ToDisplayString();
+                    if (containingClass == _flagAttributeFullName)
+                    {
+                        return false;
+                    }
                 }
             }
 
             return true;
         }
+
+        private string ParseSilentEnum(SyntaxNodeAnalysisContext context)
+        {
+            var globalOptions = context.Options.AnalyzerConfigOptionsProvider.GlobalOptions;
+
+            string? silentEnumList = null;
+            globalOptions?.TryGetValue("build_property.SwitchCompletenessMuteEnums", out silentEnumList);
+            
+            if (string.IsNullOrWhiteSpace(silentEnumList))
+            {
+                return Delimiter;
+            }
+
+            if (!silentEnumList!.EndsWith(Delimiter))
+            {
+                return silentEnumList + Delimiter;
+            }
+
+            return Delimiter;
+        }
+
     }
 }

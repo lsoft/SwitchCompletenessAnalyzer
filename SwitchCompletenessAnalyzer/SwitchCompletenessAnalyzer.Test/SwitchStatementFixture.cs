@@ -6,7 +6,7 @@ using VerifyCS = SwitchCompletenessAnalyzer.Test.CSharpAnalyzerVerifier<SwitchCo
 namespace SwitchCompletenessAnalyzer.Test
 {
     [TestClass]
-    public class SwitchCompletenessAnalyzerUnitTest
+    public class SwitchStatementFixture
     {
         /// <summary>
         /// No diagnostics expected to show up

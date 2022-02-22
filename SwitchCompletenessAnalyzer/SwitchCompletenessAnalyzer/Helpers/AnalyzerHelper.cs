@@ -9,7 +9,7 @@ namespace SwitchCompletenessAnalyzer.Helpers
 {
     internal static class AnalyzerHelper
     {
-        public static T TryGetSyntaxNode<T>(this SyntaxNodeAnalysisContext context) where T : SyntaxNode
+        public static T? TryGetSyntaxNode<T>(this SyntaxNodeAnalysisContext context) where T : SyntaxNode
         {
             if (!(context.Node is T node))
             {

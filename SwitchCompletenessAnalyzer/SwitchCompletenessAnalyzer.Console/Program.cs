@@ -9,6 +9,9 @@ namespace SwitchCompletenessAnalyzer.Console
 {
     class Program
     {
+        private static Silent1Enum _silent1 = Silent1Enum.S0;
+        private static Silent2Enum _silent2 = Silent2Enum.S0;
+
         static void Main(string[] args)
         {
             var subject = SubjectEnum.S0;
@@ -32,9 +35,27 @@ namespace SwitchCompletenessAnalyzer.Console
                 default:
                     break;
             }
+            switch (_silent1)
+            {
+                case Silent1Enum.S0:
+                    break;
+                case Silent1Enum.S2:
+                    break;
+                default:
+                    break;
+            }
 
             var silent2 = Silent2Enum.S0;
             switch (silent2)
+            {
+                case Silent2Enum.S0:
+                    break;
+                case Silent2Enum.S2:
+                    break;
+                default:
+                    break;
+            }
+            switch (_silent2)
             {
                 case Silent2Enum.S0:
                     break;
