@@ -184,7 +184,7 @@ namespace SwitchCompletenessAnalyzer
 
             string? silentEnumList = null;
             globalOptions?.TryGetValue("build_property.SwitchCompletenessMuteEnums", out silentEnumList);
-            
+
             if (string.IsNullOrWhiteSpace(silentEnumList))
             {
                 return Delimiter;
@@ -192,10 +192,11 @@ namespace SwitchCompletenessAnalyzer
 
             if (!silentEnumList!.EndsWith(Delimiter))
             {
+                //System.IO.File.AppendAllText(@"C:\temp\_a.txt", ((silentEnumList + Delimiter)?.ToString() ?? "no silentEnumList + Delimiter") + Environment.NewLine);
                 return silentEnumList + Delimiter;
             }
 
-            return Delimiter;
+            return silentEnumList;
         }
 
     }

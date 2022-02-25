@@ -14,6 +14,49 @@ namespace SwitchCompletenessAnalyzer.Console
 
         static void Main(string[] args)
         {
+        }
+
+        static void SwitchExpression(string[] args)
+        {
+            var subject = SubjectEnum.S0;
+            var a = subject switch
+            {
+                SubjectEnum.S0 => "0",
+                SubjectEnum.S2 => "2",
+                _ => null,
+            };
+
+            var silent1 = Silent1Enum.S0;
+            var b1 = silent1 switch
+            {
+                Silent1Enum.S0 => "0",
+                Silent1Enum.S2 => "2",
+                _ => null,
+            };
+            var b2 = silent1 switch
+            {
+                Silent1Enum.S0 => "0",
+                Silent1Enum.S2 => "2",
+                _ => null,
+            };
+
+            var silent2 = Silent2Enum.S0;
+            var c1 = silent2 switch
+            {
+                Silent2Enum.S0 => "0",
+                Silent2Enum.S2 => "2",
+                _ => null,
+            };
+            var c2 = silent2 switch
+            {
+                Silent2Enum.S0 => "0",
+                Silent2Enum.S2 => "2",
+                _ => null,
+            };
+        }
+
+        static void SwitchStatement(string[] args)
+        {
             var subject = SubjectEnum.S0;
             switch (subject)
             {
