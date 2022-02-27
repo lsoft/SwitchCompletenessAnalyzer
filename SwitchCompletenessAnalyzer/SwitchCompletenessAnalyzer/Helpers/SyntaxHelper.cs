@@ -11,6 +11,8 @@ namespace SwitchCompletenessAnalyzer.Helpers
     {
         private static readonly Dictionary<long, ISymbol> _emptyDictionary = new Dictionary<long, ISymbol>();
 
+        #region switch expression
+
         public static IReadOnlyDictionary<long, ISymbol> GetLabelSymbols(
             this SwitchExpressionSyntax switchExpression,
             SemanticModel model,
@@ -32,26 +34,11 @@ namespace SwitchCompletenessAnalyzer.Helpers
                 return _emptyDictionary;
             }
 
-            var labelSymbols = new Dictionary<long, ISymbol>();
-
-            foreach (var label in caseLabels)
-            {
-                if (!(model.GetSymbolInfo(label, cancellationToken).Symbol is IFieldSymbol fieldSymbol))
-                {
-                    // something is wrong with the label and the SemanticModel was unable to determine its symbol
-                    // or the symbol is not a field symbol which should be for case labels of switchs on enum types
-                    // abort analyzer
-                    return _emptyDictionary;
-                }
-                if (fieldSymbol.ConstantValue == null)
-                {
-                    //something wrong with access to value of the enum
-                    return _emptyDictionary;
-                }
-
-                var enumValue = fieldSymbol.ConstantValue.ToInt64();
-                labelSymbols.Add(enumValue, fieldSymbol);
-            }
+            var labelSymbols = ProvideLabelSymbols(
+                model,
+                cancellationToken,
+                caseLabels
+                );
 
             return labelSymbols;
         }
@@ -83,7 +70,9 @@ namespace SwitchCompletenessAnalyzer.Helpers
             return caseLabels;
         }
 
+        #endregion
 
+        #region switch statement
         public static IReadOnlyDictionary<long, ISymbol> GetLabelSymbols(
             this SwitchStatementSyntax switchStatement,
             SemanticModel model,
@@ -105,26 +94,11 @@ namespace SwitchCompletenessAnalyzer.Helpers
                 return _emptyDictionary;
             }
 
-            var labelSymbols = new Dictionary<long, ISymbol>();
-
-            foreach (var label in caseLabels)
-            {
-                if (!(model.GetSymbolInfo(label, cancellationToken).Symbol is IFieldSymbol fieldSymbol))
-                {
-                    // something is wrong with the label and the SemanticModel was unable to determine its symbol
-                    // or the symbol is not a field symbol which should be for case labels of switchs on enum types
-                    // abort analyzer
-                    return _emptyDictionary;
-                }
-                if (fieldSymbol.ConstantValue == null)
-                {
-                    //something wrong with access to value of the enum
-                    return _emptyDictionary;
-                }
-
-                var enumValue = fieldSymbol.ConstantValue.ToInt64();
-                labelSymbols.Add(enumValue, fieldSymbol);
-            }
+            var labelSymbols = ProvideLabelSymbols(
+                model,
+                cancellationToken,
+                caseLabels
+                );
 
             return labelSymbols;
         }
@@ -163,5 +137,50 @@ namespace SwitchCompletenessAnalyzer.Helpers
             return caseLabels;
         }
 
+        #endregion
+
+        #region private code
+
+        private static IReadOnlyDictionary<long, ISymbol> ProvideLabelSymbols(
+            SemanticModel model,
+            CancellationToken cancellationToken,
+            IReadOnlyList<ExpressionSyntax> caseLabels
+            )
+        {
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            if (caseLabels is null)
+            {
+                throw new ArgumentNullException(nameof(caseLabels));
+            }
+
+            var labelSymbols = new Dictionary<long, ISymbol>(caseLabels.Count); //set capacity to prevent possible reallocations
+
+            foreach (var label in caseLabels)
+            {
+                if (!(model.GetSymbolInfo(label, cancellationToken).Symbol is IFieldSymbol fieldSymbol))
+                {
+                    // something is wrong with the label and the SemanticModel was unable to determine its symbol
+                    // or the symbol is not a field symbol which should be for case labels of switchs on enum types
+                    // abort analyzer
+                    return _emptyDictionary;
+                }
+                if (fieldSymbol.ConstantValue == null)
+                {
+                    //something wrong with access to value of the enum
+                    return _emptyDictionary;
+                }
+
+                var enumValue = fieldSymbol.ConstantValue.ToInt64();
+                labelSymbols.Add(enumValue, fieldSymbol);
+            }
+
+            return labelSymbols;
+        }
+
+        #endregion
     }
 }

@@ -15,7 +15,7 @@ namespace SwitchCompletenessAnalyzer
 {
     /// <summary>
     /// Check for switch over enum completness regardless of default branch existense.
-    /// This is a minor modification of https://github.com/edumserrano/roslyn-analyzers/blob/master/Source/RoslynAnalyzers/Analyzers/CodeAnalysis/Enums/SwitchOnEnumMustHandleAllCases/SwitchOnEnumMustHandleAllCasesDiagnosticAnalyzer.cs
+    /// This is a modification of https://github.com/edumserrano/roslyn-analyzers/blob/master/Source/RoslynAnalyzers/Analyzers/CodeAnalysis/Enums/SwitchOnEnumMustHandleAllCases/SwitchOnEnumMustHandleAllCasesDiagnosticAnalyzer.cs
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class SwitchCompletenessAnalyzerAnalyzer : DiagnosticAnalyzer
@@ -24,7 +24,8 @@ namespace SwitchCompletenessAnalyzer
         public const string DiagnosticId = "SWITCHCOMPLETENESS001";
         private const string Delimiter = "|";
 
-        private static readonly string _flagAttributeFullName = typeof(System.FlagsAttribute).FullName;
+        private static readonly string _flagAttributeName = nameof(FlagsAttribute);
+        private static readonly string _flagAttributeFullName = typeof(FlagsAttribute).FullName;
 
         // You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
         // See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
@@ -93,7 +94,6 @@ namespace SwitchCompletenessAnalyzer
             }
 
             var silentEnumList = ParseSilentEnum(context);
-
             if (!IsValidSwitch(enumType, ref silentEnumList))
             {
                 return;
@@ -153,12 +153,14 @@ namespace SwitchCompletenessAnalyzer
 
             if (!string.IsNullOrEmpty(silentEnumList))
             {
-                var fullName = enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                var fullName2 = fullName + Delimiter;
-                if (silentEnumList.Contains(fullName2))
+                if (silentEnumList.Contains(enumType.Name)) //fast and dirty check; helpful for better performance and lesser allocation
                 {
-                    return false;
+                    var fullName = enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                    var fullName2 = fullName + Delimiter;
+                    if (silentEnumList.Contains(fullName2))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -167,10 +169,13 @@ namespace SwitchCompletenessAnalyzer
             {
                 if (attribute.AttributeClass != null)
                 {
-                    var containingClass = attribute.AttributeClass.ToDisplayString();
-                    if (containingClass == _flagAttributeFullName)
+                    if (attribute.AttributeClass.Name.Contains(_flagAttributeName)) //fast and dirty check; helpful for better performance and lesser allocation
                     {
-                        return false;
+                        var containingClass = attribute.AttributeClass.ToDisplayString();
+                        if (containingClass == _flagAttributeFullName)
+                        {
+                            return false;
+                        }
                     }
                 }
             }

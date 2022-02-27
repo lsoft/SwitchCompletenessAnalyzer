@@ -16,8 +16,8 @@ namespace SwitchCompletenessAnalyzer.Helpers
                 throw new ArgumentNullException(nameof(enumType));
             }
 
-            var enumValues = new Dictionary<long, List<ISymbol>>();
             var enumMembers = enumType.GetMembers();
+            var enumValues = new Dictionary<long, List<ISymbol>>(enumMembers.Length); //set capacity to prevent possible reallocations
 
             foreach (var enumMember in enumMembers)
             {
