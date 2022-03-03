@@ -47,3 +47,5 @@ You can convert the warning to the error via `<WarningsAsErrors>SWITCHCOMPLETENE
 ```
 
 (enums must be divided with `|` symbol)
+
+Nuget package can be downloaded [here](https://www.nuget.org/packages/SwitchCompletenessAnalyzer).
