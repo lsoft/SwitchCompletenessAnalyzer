@@ -121,6 +121,18 @@ namespace SwitchCompletenessAnalyzer.Helpers
                 {
                     foreach (var label in labels)
                     {
+                        if (label is CasePatternSwitchLabelSyntax casePatternLabel)
+                        {
+                            if (caseLabels == null)
+                            {
+                                caseLabels = new List<ExpressionSyntax>();
+                            }
+
+                            if (casePatternLabel.Pattern is ConstantPatternSyntax cps)
+                            {
+                                caseLabels.Add(cps.Expression);
+                            }
+                        }
                         if (label is CaseSwitchLabelSyntax caseLabel)
                         {
                             if (caseLabels == null)

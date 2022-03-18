@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Threading.Tasks;
 using VerifyCS = SwitchCompletenessAnalyzer.Test.CSharpAnalyzerVerifier<SwitchCompletenessAnalyzer.SwitchCompletenessAnalyzerAnalyzer>;
 
@@ -217,6 +218,42 @@ namespace MyNamespace
                 case MyEnum.A:
                     break;
                 case MyEnum.C:
+                    break;
+            }
+        }
+    }
+}
+";
+
+            await VerifyCS.VerifyAnalyzerAsync(test, new DiagnosticResult[0]);
+        }
+
+        [TestMethod]
+        public async Task WhenPredicate0()
+        {
+            var test = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+
+namespace MyNamespace
+{
+    class MyClass
+    {
+        public void MyMethod()
+        {
+            {|#0:switch|} (DateTime.Now.DayOfWeek)
+            {
+                case DayOfWeek.Sunday when true:
+                case DayOfWeek.Monday when true:
+                case DayOfWeek.Tuesday when true:
+                case DayOfWeek.Wednesday when true:
+                case DayOfWeek.Thursday when true:
+                case DayOfWeek.Friday when true:
+                case DayOfWeek.Saturday when true:
                     break;
             }
         }
